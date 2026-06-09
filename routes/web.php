@@ -23,7 +23,9 @@ Route::post('/login',    [AuthController::class, 'login']);
 Route::post('/logout',   [AuthController::class, 'logout'])->name('logout');
 
 // ── Recuperación de contraseña ─────────────────────────────────────────────────
-Route::get('/forgot-password',  [PasswordResetController::class, 'showForm'])->name('password.request');
-Route::post('/forgot-password', [PasswordResetController::class, 'sendLink'])->name('password.email');
-Route::get('/reset-password/{token}', [PasswordResetController::class, 'showReset'])->name('password.reset');
-Route::post('/reset-password',  [PasswordResetController::class, 'reset'])->name('password.update');
+Route::get('/forgot-password',   [PasswordResetController::class, 'showForm'])->name('password.request');
+Route::post('/forgot-password',  [PasswordResetController::class, 'sendCode'])->name('password.email');
+Route::get('/verify-code',       [PasswordResetController::class, 'showVerify'])->name('password.verify');
+Route::post('/verify-code',      [PasswordResetController::class, 'verifyCode'])->name('password.verify.check');
+Route::get('/reset-password',    [PasswordResetController::class, 'showReset'])->name('password.reset');
+Route::post('/reset-password',   [PasswordResetController::class, 'reset'])->name('password.update');
