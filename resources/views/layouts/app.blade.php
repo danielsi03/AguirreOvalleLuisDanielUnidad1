@@ -86,7 +86,12 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('contacto') ? 'active' : '' }}" href="{{ route('contacto') }}">
-                        <i class="bi bi-chat-dots"></i> Contáctanos
+                        <i class="bi bi-envelope"></i> Contáctanos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('contacto') }}#chat">
+                        <i class="bi bi-chat-dots"></i> Chat
                     </a>
                 </li>
                 <li class="nav-item">
