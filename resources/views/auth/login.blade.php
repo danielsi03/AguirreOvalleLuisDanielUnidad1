@@ -93,6 +93,7 @@
 
 @push('scripts')
 <script>
+    // Mostrar / ocultar contraseña
     document.getElementById('togglePassword').addEventListener('click', function () {
         const input = document.getElementById('password');
         const icon  = document.getElementById('eyeIcon');
@@ -104,5 +105,43 @@
             icon.className = 'bi bi-eye';
         }
     });
+
+    // Validación frontend
+    (function () {
+        const form  = document.getElementById('loginForm');
+        const email = document.getElementById('email');
+        const pass  = document.getElementById('password');
+
+        function showErr(input, msg) {
+            input.classList.add('is-invalid');
+            input.classList.remove('is-valid');
+            let fb = input.closest('.mb-3, .input-group')?.querySelector('.invalid-feedback');
+            if (!fb) { fb = document.createElement('div'); fb.className = 'invalid-feedback'; input.after(fb); }
+            fb.textContent = msg;
+        }
+        function clearErr(input) {
+            input.classList.remove('is-invalid');
+            input.classList.add('is-valid');
+        }
+
+        email.addEventListener('blur', function () {
+            if (!this.value.trim()) showErr(this, 'El correo electrónico es obligatorio.');
+            else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value.trim())) showErr(this, 'Ingresa un correo electrónico válido.');
+            else clearErr(this);
+        });
+
+        pass.addEventListener('blur', function () {
+            if (!this.value) showErr(this, 'La contraseña es obligatoria.');
+            else clearErr(this);
+        });
+
+        form.addEventListener('submit', function (e) {
+            let ok = true;
+            if (!email.value.trim()) { showErr(email, 'El correo electrónico es obligatorio.'); ok = false; }
+            else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) { showErr(email, 'Ingresa un correo electrónico válido.'); ok = false; }
+            if (!pass.value) { showErr(pass, 'La contraseña es obligatoria.'); ok = false; }
+            if (!ok) e.preventDefault();
+        });
+    })();
 </script>
 @endpush

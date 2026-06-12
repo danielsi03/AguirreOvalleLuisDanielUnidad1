@@ -32,9 +32,9 @@
                 </a>
             </div>
             <div class="col-md-6 text-center">
-                <div class="p-5 rounded-4" style="background:#f0f4f8;">
-                    <i class="bi bi-mortarboard-fill" style="font-size:5rem; color:#2d7dd2;"></i>
-                </div>
+                <img src="https://picsum.photos/seed/education/600/420"
+                     alt="Equipo educativo"
+                     class="img-fluid rounded-4 shadow">
             </div>
         </div>
     </div>
@@ -75,13 +75,18 @@
     <div class="container">
         <h2 class="text-center fw-bold mb-5" style="color:#1a3c5e;">Galería</h2>
         <div class="row g-3">
-            @for($i = 1; $i <= 6; $i++)
+            @foreach(['webdev','coding','design','technology','laptop','programming'] as $seed)
             <div class="col-6 col-md-4">
-                <div class="rounded-3 overflow-hidden" style="height:160px; background: linear-gradient(135deg, #1a3c5e{{ $i*15 }}, #2d7dd2); display:flex; align-items:center; justify-content:center;">
-                    <i class="bi bi-image text-white opacity-50" style="font-size:3rem;"></i>
+                <div class="rounded-3 overflow-hidden" style="height:200px;">
+                    <img src="https://picsum.photos/seed/{{ $seed }}/600/400"
+                         alt="Galería"
+                         class="w-100 h-100"
+                         style="object-fit:cover; transition:transform .3s;"
+                         onmouseover="this.style.transform='scale(1.05)'"
+                         onmouseout="this.style.transform='scale(1)'">
                 </div>
             </div>
-            @endfor
+            @endforeach
         </div>
     </div>
 </section>

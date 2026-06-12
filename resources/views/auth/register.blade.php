@@ -165,16 +165,52 @@
 
     // Validación en tiempo real: confirmar contraseña
     document.getElementById('password_confirmation').addEventListener('input', function () {
-        const pass    = document.getElementById('password').value;
-        const errDiv  = document.getElementById('confirmError');
-        const input   = this;
+        const pass   = document.getElementById('password').value;
+        const errDiv = document.getElementById('confirmError');
         if (this.value && this.value !== pass) {
-            input.classList.add('is-invalid');
+            this.classList.add('is-invalid');
             errDiv.style.display = 'block';
         } else {
-            input.classList.remove('is-invalid');
+            this.classList.remove('is-invalid');
             errDiv.style.display = 'none';
         }
+    });
+
+    // Bloquear envío si hay campos inválidos
+    document.getElementById('registerForm').addEventListener('submit', function (e) {
+        let ok = true;
+
+        function err(input, msg) {
+            input.classList.add('is-invalid');
+            let fb = input.parentElement.querySelector('.invalid-feedback');
+            if (!fb) { fb = document.createElement('div'); fb.className = 'invalid-feedback'; input.after(fb); }
+            fb.textContent = msg;
+            ok = false;
+        }
+
+        const name  = document.getElementById('name');
+        const email = document.getElementById('email');
+        const pass  = document.getElementById('password');
+        const conf  = document.getElementById('password_confirmation');
+
+        if (!name.value.trim() || name.value.trim().length < 2)
+            err(name, 'El nombre debe tener al menos 2 caracteres.');
+
+        if (!email.value.trim())
+            err(email, 'El correo electrónico es obligatorio.');
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim()))
+            err(email, 'Ingresa un correo electrónico válido.');
+
+        if (!pass.value)
+            err(pass, 'La contraseña es obligatoria.');
+
+        if (conf.value && conf.value !== pass.value) {
+            conf.classList.add('is-invalid');
+            document.getElementById('confirmError').style.display = 'block';
+            ok = false;
+        }
+
+        if (!ok) e.preventDefault();
     });
 </script>
 @endpush

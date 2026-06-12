@@ -13,27 +13,58 @@
 
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
-                    <form method="POST" action="{{ route('contacto.enviar') }}">
+                    <form method="POST" action="{{ route('contacto.enviar') }}" novalidate id="contactoForm">
                         @csrf
+
+                        {{-- Honeypot: los bots rellenan este campo; los humanos lo ignoran --}}
+                        <input type="text" name="website" class="d-none" tabindex="-1" autocomplete="off" value="">
+
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Nombre</label>
-                                <input type="text" name="nombre" class="form-control" placeholder="Tu nombre">
+                                <label class="form-label fw-semibold">Nombre <span class="text-danger">*</span></label>
+                                <input type="text" name="nombre"
+                                    class="form-control @error('nombre') is-invalid @enderror"
+                                    value="{{ old('nombre') }}"
+                                    placeholder="Tu nombre">
+                                @error('nombre')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Correo electrónico</label>
-                                <input type="email" name="email" class="form-control" placeholder="correo@ejemplo.com">
+                                <label class="form-label fw-semibold">Correo electrónico <span class="text-danger">*</span></label>
+                                <input type="email" name="email"
+                                    class="form-control @error('email') is-invalid @enderror"
+                                    value="{{ old('email') }}"
+                                    placeholder="correo@ejemplo.com">
+                                @error('email')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-12">
-                                <label class="form-label fw-semibold">Asunto</label>
-                                <input type="text" name="asunto" class="form-control" placeholder="Asunto del mensaje">
+                                <label class="form-label fw-semibold">Asunto <span class="text-danger">*</span></label>
+                                <input type="text" name="asunto"
+                                    class="form-control @error('asunto') is-invalid @enderror"
+                                    value="{{ old('asunto') }}"
+                                    placeholder="Asunto del mensaje">
+                                @error('asunto')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-12">
-                                <label class="form-label fw-semibold">Mensaje</label>
-                                <textarea name="mensaje" class="form-control" rows="5" placeholder="Escribe tu mensaje aquí..."></textarea>
+                                <label class="form-label fw-semibold">Mensaje <span class="text-danger">*</span></label>
+                                <textarea name="mensaje"
+                                    class="form-control @error('mensaje') is-invalid @enderror"
+                                    rows="5"
+                                    placeholder="Escribe tu mensaje aquí (mínimo 10 caracteres)...">{{ old('mensaje') }}</textarea>
+                                @error('mensaje')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <div class="text-end mt-1">
+                                    <small id="msgCount" class="text-muted">0 / 2000</small>
+                                </div>
                             </div>
                             <div class="col-12">
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary" id="contactoSubmit">
                                     <i class="bi bi-send me-1"></i> Enviar mensaje
                                 </button>
                             </div>
@@ -168,6 +199,93 @@
 @endpush
 
 @push('scripts')
+<script>
+// ── Validación frontend del formulario de contacto ──────────────────────────
+(function () {
+    const form = document.getElementById('contactoForm');
+    if (!form) return;
+
+    const rules = {
+        nombre:  { min: 2,  msg: 'El nombre debe tener al menos 2 caracteres.' },
+        email:   { email: true, msg: 'Ingresa un correo electrónico válido.' },
+        asunto:  { min: 3,  msg: 'El asunto debe tener al menos 3 caracteres.' },
+        mensaje: { min: 10, msg: 'El mensaje debe tener al menos 10 caracteres.' },
+    };
+
+    function getFeedback(input) {
+        return input.parentElement.querySelector('.invalid-feedback') ||
+            (() => {
+                const d = document.createElement('div');
+                d.className = 'invalid-feedback';
+                input.after(d);
+                return d;
+            })();
+    }
+
+    function validate(input) {
+        const val  = input.value.trim();
+        const rule = rules[input.name];
+        if (!rule) return true;
+
+        let error = '';
+        if (!val) {
+            error = 'Este campo es obligatorio.';
+        } else if (rule.min && val.length < rule.min) {
+            error = rule.msg;
+        } else if (rule.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) {
+            error = rule.msg;
+        }
+
+        const fb = getFeedback(input);
+        if (error) {
+            input.classList.add('is-invalid');
+            input.classList.remove('is-valid');
+            fb.textContent = error;
+            return false;
+        }
+        input.classList.remove('is-invalid');
+        input.classList.add('is-valid');
+        fb.textContent = '';
+        return true;
+    }
+
+    // Validación en tiempo real al salir del campo
+    Object.keys(rules).forEach(name => {
+        const el = form.querySelector(`[name="${name}"]`);
+        if (el) el.addEventListener('blur', () => validate(el));
+    });
+
+    // Contador de caracteres para el mensaje
+    const textarea = form.querySelector('[name="mensaje"]');
+    const counter  = document.getElementById('msgCount');
+    if (textarea && counter) {
+        counter.textContent = textarea.value.length + ' / 2000';
+        textarea.addEventListener('input', () => {
+            const len = textarea.value.length;
+            counter.textContent = len + ' / 2000';
+            counter.className = len > 1900 ? 'text-warning fw-semibold' : 'text-muted';
+        });
+    }
+
+    // Bloquear envío si hay errores
+    form.addEventListener('submit', function (e) {
+        let ok = true;
+        Object.keys(rules).forEach(name => {
+            const el = form.querySelector(`[name="${name}"]`);
+            if (el && !validate(el)) ok = false;
+        });
+        if (!ok) {
+            e.preventDefault();
+            form.querySelector('.is-invalid')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    });
+
+    // Scroll al primer error si vino del servidor
+    const firstError = form.querySelector('.is-invalid');
+    if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+})();
+</script>
+
 <script>
 (function () {
 
