@@ -85,7 +85,7 @@
                     </div>
                     <div>
                         <div class="fw-semibold small" style="color:#1a3c5e;">Dirección</div>
-                        <div class="text-muted small">Av. Tecnológica 123, Ciudad</div>
+                        <div class="text-muted small">Av.V. Carranza 123, Saltillo, Coah.</div>
                     </div>
                 </li>
                 <li class="d-flex align-items-start gap-3 mb-3">

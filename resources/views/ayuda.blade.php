@@ -219,7 +219,7 @@
                                 </div>
                                 <div>
                                     <div class="fw-semibold small" style="color:#1a3c5e;">Correo</div>
-                                    <div class="text-muted small">soporte@portalweb.com</div>
+                                    <div class="text-muted small">daniel.aguirre.ldao@gmail.com</div>
                                 </div>
                             </div>
                         </div>
